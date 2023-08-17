@@ -1,135 +1,113 @@
 import java.util.Scanner;
 
-//Smart Banking App
-public class CLI_Assignment2{
+// Smart Banking App
+public class CLI_Assignment2 {
     private static final Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
-        final String CLEAR = "\033[H\033[2J"; //To clear the terminal 
+        final String CLEAR = "\033[H\033[2J"; // To clear the terminal
         final String COLOR_BLUE_BOLD = "\033[34;1m";
         final String RESET = "\033[0m";
         final String COLOR_RED_BOLD = "\033[31;1m";
-       
+
         final String DASHBOARD = "Welcome to Smart Banking App";
         final String OPEN_ACCOUNT = "Open New Account";
+        
 
-        String[] accountHolderName = new String[0];
-        //String[] accountNumber = new String[0];
-        double[] deposit = new double[0];
+        String[][] accountInfo = new String[0][0]; // [Account][0: Name, 1: Number, 2: Deposit]
         String screen = DASHBOARD;
 
         do {
-            //Print dashboard
+            // Print dashboard
             final String APP_TITLE = String.format("%s%s%s", COLOR_BLUE_BOLD, screen, RESET);
 
             System.out.println(CLEAR);
             System.out.println("-".repeat(50));
-            System.out.println(" ".repeat((50 - APP_TITLE.length() + 7)/2).concat(APP_TITLE));
+            System.out.println(" ".repeat((50 - APP_TITLE.length() + 7) / 2).concat(APP_TITLE));
             System.out.println("-".repeat(50));
 
-            switch(screen){
-                case DASHBOARD: 
+            switch (screen) {
+                case DASHBOARD:
                     System.out.println("[1]. Open New Account\n[2]. Exit\n");
                     System.out.println("Enter an option to continue > ");
                     int option = scanner.nextInt();
                     scanner.nextLine();
 
-                    switch (option){
-                        case 1: screen = OPEN_ACCOUNT; break;
+                    switch (option) {
+                        case 1:
+                            screen = OPEN_ACCOUNT;
+                            break;
                         case 2: System.exit(0); break;
-                        default: continue;
+                        default:
+                            continue;
                     }
                     break;
 
-
-                //To open account
+                // To open account
                 case OPEN_ACCOUNT:
+                    // Generate the account number
+                    String newAccountNumber = String.format("SDB-S%05d", accountInfo.length + 1);
+                    System.out.println("New Account Number: " + newAccountNumber);
 
-                    //Generate the account number
-                    System.out.printf("New Account Number: SDB-S%05d \n", (accountHolderName.length+1));
-
-                    
                     boolean valid;
                     String name;
-                    double initialDeposit=0;
+                    double initialDeposit = 0;
 
-
-                    //Get account holder name and Validating name of the account holder
-                    do{
-
+                    // Get account holder name and validate it
+                    do {
                         valid = true;
                         System.out.println("Enter Account Holder Name: ");
-
                         name = scanner.nextLine().strip();
 
-                        if(name.isBlank()){
-                            System.out.printf("%sName can't be empty%s\n",COLOR_RED_BOLD, RESET);
+                        if (name.isBlank()) {
+                            System.out.println(COLOR_RED_BOLD + "Name can't be empty" + RESET);
                             valid = false;
                             continue;
                         }
 
                         for (int i = 0; i < name.length(); i++) {
-                           if(!(Character.isLetter(name.charAt(i)) || Character.isSpaceChar(name.charAt(i)))) {
-                                System.out.printf("%sInvalid Names%s\n", COLOR_RED_BOLD, RESET);
+                            if (!(Character.isLetter(name.charAt(i)) || Character.isSpaceChar(name.charAt(i)))) {
+                                System.out.println(COLOR_RED_BOLD + "Invalid Names" + RESET);
                                 valid = false;
                                 break;
                             }
-                        
                         }
+                    } while (!valid);
 
-                    }while(!valid);
-
-                    //Add the new account holder name to the array.
-                    String[] newAccountHolderName = new String[accountHolderName.length + 1];
-                    for (int i = 0; i < accountHolderName.length; i++) {
-                        newAccountHolderName[i] = accountHolderName[i];
-                    }
-                    newAccountHolderName[newAccountHolderName.length-1] = name;
-                    accountHolderName = newAccountHolderName;
-
-
-                    // Get initial deposit amount and validate it.
+                    // Get initial deposit amount and validate it
                     do {
                         valid = true;
                         System.out.println("Enter Initial Deposit (minimum 5000): ");
                         try {
                             initialDeposit = Double.parseDouble(scanner.nextLine());
                             if (initialDeposit < 5000) {
-                                System.out.printf("%sInitial deposit must be at least 5000%s\n", COLOR_RED_BOLD, RESET);
+                                System.out.println(COLOR_RED_BOLD + "Initial deposit must be at least 5000" + RESET);
                                 valid = false;
                             }
                         } catch (NumberFormatException e) {
-                            System.out.printf("%sInvalid input. Please enter a valid amount%s\n", COLOR_RED_BOLD, RESET);
+                            System.out.println(COLOR_RED_BOLD + "Invalid input. Please enter a valid amount" + RESET);
                             valid = false;
                         }
                     } while (!valid);
 
-                    //Add the ne deposit to the array.
-                    double[] newDeposit = new double[deposit.length + 1];
-                    for (int i = 0; i < deposit.length; i++) {
-                        newDeposit[i] = deposit[i];
-                    }
-                    newDeposit[newDeposit.length-1] = initialDeposit;
-                    deposit = newDeposit;
+                    // Create new account entry in the 3D array
+                    String[][] newAccountInfo = new String[accountInfo.length + 1][3];
+                    newAccountInfo[accountInfo.length][0] = name;
+                    newAccountInfo[accountInfo.length][1] = newAccountNumber;
+                    newAccountInfo[accountInfo.length][2] = String.valueOf(initialDeposit);
 
-
-                    //ask for new entry.
-                    System.out.println(name + " added succesfully. Do you want to open new account (Y/n)? ");
-                    if(scanner.nextLine().toUpperCase().strip().equals("Y")){
+                    System.out.println(name + " added successfully. Do you want to open a new account (Y/n)? ");
+                    if (scanner.nextLine().toUpperCase().strip().equals("Y")) {
                         continue;
-                    } 
+                    }
+                    accountInfo = newAccountInfo;
                     screen = DASHBOARD;
                     break;
 
-                 
                 default:
                     System.exit(0);
-  
-                }
-            
+            }
 
-            }while(true);
-            
-
-        
+        } while (true);
     }
 }
